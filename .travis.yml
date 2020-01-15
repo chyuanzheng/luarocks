@@ -39,7 +39,7 @@ integration_script: &integration_script
 binaries_script: &binaries_script
   - ./configure --with-lua=lua_install
   - make
-  - make $BINARY_TARGET MINGW_SYSROOT=/usr/$ARCH-w64-mingw32/lib
+  - make $BINARY_TARGET MINGW_SYSROOT=/usr/$ARCH-w64-mingw32/lib $EXTRA_VARS
   - make $PACK_TARGET packbinarydir=luarocks-$VERSION-$OS-$ARCH packbinaryfile=luarocks-$VERSION-$OS-$ARCH.zip buildbinarydir=$BUILD_BINARY_DIR exeext=$EXEEXT
   - curl -T luarocks-$VERSION-$OS-$ARCH/luarocks-$VERSION-$OS-$ARCH.zip -X PUT -u $BINTRAY_USER:$BINTRAY_API_KEY "https://api.bintray.com/content/luarocks/luarocks/luarocks-$OS$FLAVOR/$VERSION/luarocks-$VERSION-$OS-$ARCH.zip?publish=1"
 
@@ -206,10 +206,16 @@ jobs:
       script: *binaries_script
       language: generic
       os: osx
+      addons:
+        homebrew:
+          packages:
+            zlib
+            openssl
       env:
         - OS="macos"
         - ARCH="x86_64"
         - FLAVOR="-nightly"
+        - EXTRA_VARS="OPENSSL_DIR=/usr/local/opt"
         - BINARY_TARGET=binary
         - PACK_TARGET=pack-binary
         - BUILD_BINARY_DIR=build-binary
